@@ -1,25 +1,20 @@
-from flask import Flask, jsonify
-from test import testing
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from .repository.dbConfig import DevelopmentConfig
+from .controller.home_controller import home_controller  
+
 app = Flask(__name__)
 
-@app.route('/')
-def home():
-    return jsonify(message="Welcome to the Flask Backend!")
+app.config.from_object(DevelopmentConfig)
 
-@app.route('/api/data')
-def get_data():
-    data = {
-        "name": "Flask Backend",
-        "version": "1.0",
-        "status": "Running"
-    }
-    return jsonify(data)
+db = SQLAlchemy(app)
 
-@app.route('/test')
-def test():
-    message = testing()
-    return jsonify(message), 404
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    """Closes the database session at the end of each request."""
+    db.session.remove()
 
+app.register_blueprint(home_controller)
 
 if __name__ == '__main__':
     app.run(debug=True)
