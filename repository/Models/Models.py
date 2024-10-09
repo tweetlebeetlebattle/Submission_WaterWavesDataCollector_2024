@@ -1,25 +1,41 @@
-from app import db
+from flask_sqlalchemy import SQLAlchemy
+
+db = SQLAlchemy()
 
 class Locations(db.Model):
-    __table__ = db.Table('locations', db.metadata, autoload=True, autoload_with=db.engine)
+    id = db.Column(db.Integer, primary_key=True)
+    # Define other columns here...
 
 class Units(db.Model):
-    __table__ = db.Table('units', db.metadata, autoload=True, autoload_with=db.engine)
+    id = db.Column(db.Integer, primary_key=True)
+    # Define other columns here...
 
 class HTMLData(db.Model):
-    __table__ = db.Table('htmldata', db.metadata, autoload=True, autoload_with=db.engine)
+    id = db.Column(db.Integer, primary_key=True)
+    # Define other columns here...
 
 class GifData(db.Model):
-    __table__ = db.Table('gifdata', db.metadata, autoload=True, autoload_with=db.engine)
+    id = db.Column(db.Integer, primary_key=True)
+    # Define other columns here...
 
 class GlassStormIoData(db.Model):
-    __table__ = db.Table('GlassStormIoData', db.metadata, autoload=True, autoload_with=db.engine)    
+    id = db.Column(db.Integer, primary_key=True)
+    # Define other columns here...
 
 class DailyGifReading(db.Model):
-    __table__ = db.Table('DailyGifReading', db.metadata, autoload=True, autoload_with=db.engine)   
+    id = db.Column(db.Integer, primary_key=True)
+    # Define other columns here...
 
 class DailyGlassStormReading(db.Model):
-    __table__ = db.Table('DailyGlassStormReading', db.metadata, autoload=True, autoload_with=db.engine)   
+    id = db.Column(db.Integer, primary_key=True)
+    # Define other columns here...
 
 class DailyHTMLReading(db.Model):
-    __table__ = db.Table('DailyHTMLReading', db.metadata, autoload=True, autoload_with=db.engine)   
+    id = db.Column(db.Integer, primary_key=True)
+    # Define other columns here...
+
+
+def initialize_database(app):
+    with app.app_context():  # Ensures app context is active
+        db.create_all()  # This will create the tables based on your models
+

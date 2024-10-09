@@ -1,6 +1,5 @@
 from flask import Blueprint, jsonify
 from test import testing
-
 home_controller = Blueprint('home', __name__)
 
 @home_controller.route('/')
@@ -9,11 +8,9 @@ def home():
 
 @home_controller.route('/api/data')
 def get_data():
-    data = {
-        "name": "Flask Backend",
-        "version": "1.0",
-        "status": "Running"
-    }
+    from repository.repository_gif import GifDataRepository
+    repository = GifDataRepository()  
+    data = repository.read_all_data() 
     return jsonify(data)
 
 @home_controller.route('/test')
