@@ -1,5 +1,5 @@
 from app import db
-from .Models import Units
+from repository.Models import Models
 
 class UnitsRepository:
     def __init__(self):
@@ -7,7 +7,7 @@ class UnitsRepository:
 
     def get_unit_id_by_name(self, unit_name):
         try:
-            unit = db.session.query(Units).filter_by(UnitName=unit_name).first()
+            unit = db.session.query(Models.Units).filter_by(UnitName=unit_name).first()
             if unit:
                 return unit.UnitId
             else:

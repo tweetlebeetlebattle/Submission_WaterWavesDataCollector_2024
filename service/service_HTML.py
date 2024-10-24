@@ -1,9 +1,16 @@
 import requests
+import os
+from dotenv import load_dotenv
 from bs4 import BeautifulSoup
 
+load_dotenv()
+
 class MeteoHTMLService:
-    def __init__(self, url='http://varna.meteo.bg/'):
-        self.url = url
+    def __init__(self):
+        self.url = os.getenv("HTML_url")  
+
+    def record_meteo_data():
+        return;
 
     def fetch_meteo_data(self):
         response = requests.get(self.url)
@@ -14,7 +21,7 @@ class MeteoHTMLService:
         rows = soup.find_all('tr')
         
         meteo_data = []
-        for row in rows[2:]:  # Skip the first two rows (usually headers)
+        for row in rows[2:]:  # Skip the first two rows (headers)
             cells = row.find_all('td')
             if len(cells) >= 4:
                 location = cells[1].text.strip()
@@ -29,7 +36,3 @@ class MeteoHTMLService:
         
         return meteo_data
 
-# Usage
-meteo_service = MeteoService()
-data = meteo_service.fetch_meteo_data()
-print(data)

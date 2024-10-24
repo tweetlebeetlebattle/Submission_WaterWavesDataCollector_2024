@@ -3,11 +3,22 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 class Locations(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    # Define other columns here...
+    Id = db.Column(db.Integer, primary_key=True)
+    Name = db.Column(db.String, nullable=False)
+    def to_dict(self):
+        return {
+            'id': self.Id,
+            'name': self.Name, 
+        }
 
 class Units(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    UnitId = db.Column(db.Integer, primary_key=True)
+    UnitName = db.Column(db.String, nullable=False)
+    def to_dict(self):
+        return {
+            'id': self.UnitId,
+            'name': self.UnitName,  
+        }
     # Define other columns here...
 
 class HTMLData(db.Model):

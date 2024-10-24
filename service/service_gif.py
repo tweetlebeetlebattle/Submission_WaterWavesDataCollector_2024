@@ -4,21 +4,22 @@ import shutil
 import numpy as np
 from PIL import Image
 from dotenv import load_dotenv
-from media_assets.colourScheme import colour_waveHight_map_at_40_quant
-from media_assets.coordinates import location_pixel_coordinate_map
+from service.media_assets.colourScheme import colour_waveHight_map_at_40_quant
+from service.media_assets.coordinates import location_pixel_coordinate_map
+from repository.repository_locations import LocationsRepository
+from repository.repository_units import UnitsRepository
 
 class MeteoGifService:
     def __init__(self):
         load_dotenv()
         self.gif_url = os.getenv("gif_url")
-        self.gif_directory = os.getenv("gifSource")
-        self.frames_directory = os.getenv("framesDirectory")
-        self.frames_edited_directory = os.getenv("framesEditedDirectory")
+        self.gif_directory = os.path.join(os.getcwd(), "PythonTest", "service", "media_assets", "gifs")
+        self.frames_directory = os.path.join(os.getcwd(), "PythonTest", "service", "media_assets", "frames")
+        self.frames_edited_directory = os.path.join(os.getcwd(), "PythonTest", "service", "media_assets", "framesEdited")
         self.coordinates = location_pixel_coordinate_map
         self.colour_waveHight_map = colour_waveHight_map_at_40_quant
 
     def fetch_gif_data(self):
-        """Public method to handle the entire GIF fetching, processing, and analysis workflow."""
         self._download_gif(self.gif_url, self.gif_directory)
         self._extract_gif_frames(self.gif_directory, self.frames_directory)
         self._quantize_colors_in_directory(self.frames_directory, self.frames_edited_directory, 40)
@@ -26,14 +27,18 @@ class MeteoGifService:
         self._delete_all_files(self.gif_directory, self.frames_directory, self.frames_edited_directory)
 
     def _download_gif(self, gif_url, download_location):
+        
         gif_path = os.path.join(download_location, 'downloaded.gif')
         response = requests.get(gif_url)
 
-        with open(gif_path, 'wb') as gif_file:
-            gif_file.write(response.content)
-
-        print(f'GIF downloaded and saved to {gif_path}')
-        return gif_path
+        if response.status_code == 200:
+            with open(gif_path, 'wb') as gif_file:
+                gif_file.write(response.content)
+            print(f'GIF downloaded and saved to {gif_path}')
+            return gif_path
+        else:
+            print(f'Failed to download GIF. Status code: {response.status_code}')
+            return None
 
     def _extract_gif_frames(self, folder_path, frame_folder):
         if not os.path.exists(folder_path):
@@ -79,7 +84,6 @@ class MeteoGifService:
         for filename in os.listdir(source_path):
             if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
                 image_path = os.path.join(source_path, filename)
-                print(f"Processing image: {image_path}")
 
                 image = Image.open(image_path)
                 if image.mode != 'RGB':
@@ -105,9 +109,6 @@ class MeteoGifService:
                 output_image_path = os.path.join(destination_path, f'quantized_{filename}')
                 quantized_image.save(output_image_path)
                 print(f"Quantized image saved as {output_image_path}")
-                print(f"Total unique colors after quantization: {len(color_dict)}")
-                print("Sample of unique colors (first 10):", list(color_dict.items())[:10])
-                print()
 
     def _analyze_image(self, source_path, color_dict, location_coordinate_map):
         for image_file in os.listdir(source_path):
@@ -122,10 +123,8 @@ class MeteoGifService:
                 print(f"Analyzing image: {image_file}")
 
                 for location, coords in location_coordinate_map.items():
-                    print(f"Location: {location}, Initial Coordinates: {coords}")
 
                     if not isinstance(coords, tuple) or len(coords) != 2:
-                        print(f"Error: Invalid coordinates for {location}. Expected a tuple of (x, y), got {coords}")
                         continue
 
                     x, y = coords
@@ -141,7 +140,6 @@ class MeteoGifService:
                                     break
 
                             if not found:
-                                print(f"{location} ({x}, {y}): Not found in dictionary. RGB value: {pixel_rgb}")
                                 x += 1
 
                         except IndexError:
@@ -169,6 +167,3 @@ class MeteoGifService:
             else:
                 print(f"Directory {directory} does not exist.")
 
-# Usage
-gif_service = GifProcessingService()
-gif_service.fetch_gif_data()

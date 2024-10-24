@@ -1,5 +1,5 @@
 from app import db
-from .Models import Locations
+from .Models import Models
 
 class LocationsRepository:
     def __init__(self):
@@ -7,7 +7,7 @@ class LocationsRepository:
 
     def get_location_id_by_name(self, location_name):
         try:
-            location = db.session.query(Locations).filter_by(Name=location_name).first()
+            location = db.session.query(Models.Locations).filter_by(Name=location_name).first()
 
             if location:
                 return location.Id
@@ -16,3 +16,4 @@ class LocationsRepository:
         except Exception as e:
             print(f"An error occurred: {e}")
             return None
+  

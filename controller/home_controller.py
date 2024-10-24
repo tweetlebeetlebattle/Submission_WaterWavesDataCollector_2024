@@ -15,5 +15,12 @@ def get_data():
 
 @home_controller.route('/test')
 def test():
-    message = testing()
-    return jsonify(message), 404
+    # from repository.repository_locations import LocationsRepository
+    # repository = LocationsRepository()
+    # data = repository.get_location_id_by_name("Бургас");
+    # return jsonify(data)
+    from service.service_gif import MeteoGifService
+    service = MeteoGifService()
+    data = service.fetch_gif_data()
+    return jsonify(data)
+
