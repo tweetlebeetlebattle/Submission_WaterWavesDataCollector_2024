@@ -15,12 +15,17 @@ def get_data():
 
 @home_controller.route('/test')
 def test():
-    # from repository.repository_locations import LocationsRepository
-    # repository = LocationsRepository()
-    # data = repository.get_location_id_by_name("Бургас");
-    # return jsonify(data)
-    from service.service_gif import MeteoGifService
-    service = MeteoGifService()
-    data = service.fetch_gif_data()
+    # from service.service_gif import MeteoGifService
+    # service = MeteoGifService()
+    # data = service.fetch_gif_data()
+
+    # from service.service_HTML import MeteoHTMLService
+    # service = MeteoHTMLService()
+    # data = service.fetch_meteo_data()
+
+    from service.service_GSio import GSioService
+    service = GSioService()
+    data = service.fetch_weather_for_all_locations()
+
     return jsonify(data)
 

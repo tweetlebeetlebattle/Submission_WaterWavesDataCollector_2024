@@ -2,15 +2,18 @@ import os
 import requests
 import shutil
 import numpy as np
+import re
 from PIL import Image
 from dotenv import load_dotenv
 from service.media_assets.colourScheme import colour_waveHight_map_at_40_quant
 from service.media_assets.coordinates import location_pixel_coordinate_map
-from repository.repository_locations import LocationsRepository
-from repository.repository_units import UnitsRepository
 
 class MeteoGifService:
     def __init__(self):
+        from repository.repository_gif import GifDataRepository
+        from repository.repository_gif import DailyGifReadingRepository
+        self.gif_data_repo = GifDataRepository()
+        self.daily_gif_data_repo  = DailyGifReadingRepository()
         load_dotenv()
         self.gif_url = os.getenv("gif_url")
         self.gif_directory = os.path.join(os.getcwd(), "PythonTest", "service", "media_assets", "gifs")
@@ -18,14 +21,36 @@ class MeteoGifService:
         self.frames_edited_directory = os.path.join(os.getcwd(), "PythonTest", "service", "media_assets", "framesEdited")
         self.coordinates = location_pixel_coordinate_map
         self.colour_waveHight_map = colour_waveHight_map_at_40_quant
+    
+    def insert_gif_data(self, wave_read, wave_unit_id, date, location_id):
+        return self.gif_data_repo.insert_data(wave_read, wave_unit_id, date, location_id)
+
+    def get_all_gif_data(self):
+        return self.gif_data_repo.read_all_data()
+
+    def delete_all_gif_data(self):
+        return self.gif_data_repo.delete_all_data()
+
+    def insert_daily_gif_reading(self, daily_wave_max=None, daily_wave_min=None, daily_wave_avg=None,
+                                 wave_unit_id=None, date=None, location_id=None):
+        return self.daily_gif_data_repo .insert_data(daily_wave_max, daily_wave_min, daily_wave_avg, wave_unit_id,
+                                                       date, location_id)
+
+    def get_all_daily_gif_readings(self):
+        return self.daily_gif_data_repo .read_all_data()
+
+    def delete_all_daily_gif_readings(self):
+        return self.daily_gif_data_repo .delete_all_data()
 
     def fetch_gif_data(self):
         self._download_gif(self.gif_url, self.gif_directory)
         self._extract_gif_frames(self.gif_directory, self.frames_directory)
         self._quantize_colors_in_directory(self.frames_directory, self.frames_edited_directory, 40)
-        self._analyze_image(self.frames_edited_directory, self.colour_waveHight_map, self.coordinates)
+        data = self._analyze_image(self.frames_edited_directory, self.colour_waveHight_map, self.coordinates)
+        print(data)
         self._delete_all_files(self.gif_directory, self.frames_directory, self.frames_edited_directory)
-
+        return data
+    
     def _download_gif(self, gif_url, download_location):
         
         gif_path = os.path.join(download_location, 'downloaded.gif')
@@ -111,43 +136,59 @@ class MeteoGifService:
                 print(f"Quantized image saved as {output_image_path}")
 
     def _analyze_image(self, source_path, color_dict, location_coordinate_map):
+        results = [] 
+        frame_pattern = re.compile(r"quantized_frame_(\d+)\.\w+")
+
         for image_file in os.listdir(source_path):
-            if image_file.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
-                image_path = os.path.join(source_path, image_file)
-                image = Image.open(image_path)
+            match = frame_pattern.match(image_file)
+            if not match:
+                print(f"Skipping file {image_file} as it does not match the expected pattern.")
+                continue
 
-                if image.mode != 'RGB':
-                    image = image.convert('RGB')
+            frame_id = int(match.group(1)) 
+            image_path = os.path.join(source_path, image_file)
+            image = Image.open(image_path)
 
-                image_array = np.array(image)
-                print(f"Analyzing image: {image_file}")
+            if image.mode != 'RGB':
+                image = image.convert('RGB')
 
-                for location, coords in location_coordinate_map.items():
+            image_array = np.array(image)
 
-                    if not isinstance(coords, tuple) or len(coords) != 2:
-                        continue
+            for location, coords in location_coordinate_map.items():
+                if not isinstance(coords, tuple) or len(coords) != 2:
+                    continue
 
-                    x, y = coords
-                    found = False
+                x, y = coords
+                found = False
 
-                    while not found and x < image_array.shape[1]:
-                        try:
-                            pixel_rgb = tuple(image_array[y, x])
-                            for index, colors in color_dict.items():
-                                if list(pixel_rgb) in colors:
-                                    print(f"{location} ({x}, {y}): Found index {index}")
-                                    found = True
-                                    break
+                while not found and x < image_array.shape[1]:
+                    try:
+                        pixel_rgb = tuple(image_array[y, x])
+                        for index, colors in color_dict.items():
+                            if list(pixel_rgb) in colors:
+                                results.append({
+                                    "id": frame_id,
+                                    "location": location,
+                                    "index": float(index)
+                                })
+                                found = True
+                                break
 
-                            if not found:
-                                x += 1
+                        if not found:
+                            x += 1
 
-                        except IndexError:
-                            print(f"{location} ({x}, {y}): Coordinates are out of bounds for this image.")
-                            break
+                    except IndexError:
+                        break
 
-                    if not found:
-                        print(f"{location}: No match found in the entire row for the starting y-coordinate {y}.")
+                if not found:
+                    results.append({
+                        "id": frame_id,
+                        "location": location,
+                        "index": None 
+                    })
+
+        return results
+
 
     def _delete_all_files(self, *directories):
         for directory in directories:

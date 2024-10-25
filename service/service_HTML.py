@@ -7,32 +7,75 @@ load_dotenv()
 
 class MeteoHTMLService:
     def __init__(self):
+        from repository.repository_HTML import HTMLDataRepository
+        from repository.repository_HTML import DailyHTMLReadingRepository
         self.url = os.getenv("HTML_url")  
+        self.html_data_repo = HTMLDataRepository()
+        self.daily_html_reading_repo = DailyHTMLReadingRepository()
 
-    def record_meteo_data():
-        return;
+    def insert_html_data(self, wave_read, wave_unit_id, temp_read, temp_unit_id, date, location_id):
+        return self.html_data_repo.insert_data(wave_read, wave_unit_id, temp_read, temp_unit_id, date, location_id)
+
+    def get_all_html_data(self):
+        return self.html_data_repo.read_all_data()
+
+    def delete_all_html_data(self):
+        return self.html_data_repo.delete_all_data()
+
+    def insert_daily_html_reading(self, daily_wave_max, daily_wave_min, daily_wave_avg, wave_unit_id,
+                                  daily_temp_max, daily_temp_min, daily_temp_avg, temp_unit_id,
+                                  date, location_id):
+        return self.daily_html_reading_repo.insert_data(
+            daily_wave_max, daily_wave_min, daily_wave_avg, wave_unit_id,
+            daily_temp_max, daily_temp_min, daily_temp_avg, temp_unit_id,
+            date, location_id
+        )
+
+    def get_all_daily_html_readings(self):
+        return self.daily_html_reading_repo.read_all_data()
+
+    def delete_all_daily_html_readings(self):
+        return self.daily_html_reading_repo.delete_all_data()
 
     def fetch_meteo_data(self):
         response = requests.get(self.url)
-        if response.status_code != 200:
-            raise Exception(f"Failed to retrieve data: {response.status_code}")
-        
-        soup = BeautifulSoup(response.content, 'html.parser')
-        rows = soup.find_all('tr')
-        
-        meteo_data = []
-        for row in rows[2:]:  # Skip the first two rows (headers)
-            cells = row.find_all('td')
-            if len(cells) >= 4:
-                location = cells[1].text.strip()
-                wave_height = cells[2].text.strip()
-                water_temp = cells[3].text.strip()
+        if response.status_code == 200:
+            print("Request successful!")
+            
+            soup = BeautifulSoup(response.content, 'html.parser')
+            
+            tables = soup.find_all('table')
+            print(f"Number of tables found: {len(tables)}\n")
+            
+            table_6_data = []
+            
+            # Check if Table 6 exists
+            if len(tables) >= 6:
+                # Select Table 6 (index 5 as indexing starts from 0)
+                table_6 = tables[5]
                 
-                meteo_data.append({
-                    'Location': location,
-                    'Wave Height': wave_height,
-                    'Water Temperature': water_temp
-                })
-        
-        return meteo_data
-
+                # Find all rows in Table 6 and process rows 3 to 8
+                rows = table_6.find_all('tr')
+                for row_index in range(2, 8):  # Rows 3 to 8 (0-indexed, so 2 to 7)
+                    row = rows[row_index]
+                    cells = row.find_all('td')
+                    cell_data = [cell.text.strip() for cell in cells if cell.text.strip()]
+                    
+                    if len(cell_data) == 3:
+                        # Parse wave height and temperature, handling missing temperature
+                        wave_height = int(cell_data[1].split()[0])  # Extract the number before 'бала'
+                        try:
+                            water_temp = int(cell_data[2].split()[0])  # Extract the number before '°C'
+                        except ValueError:
+                            water_temp = None  # Set to None if temperature is missing
+                            
+                        data_entry = {
+                            'location': cell_data[0],
+                            'waveHeightInBala': wave_height,
+                            'waterTempInC': water_temp
+                        }
+                        
+                        table_6_data.append(data_entry)
+            return table_6_data
+        else:
+            print(f"Request failed with status code: {response.status_code}")
