@@ -16,9 +16,9 @@ class MeteoGifService:
         self.daily_gif_data_repo  = DailyGifReadingRepository()
         load_dotenv()
         self.gif_url = os.getenv("gif_url")
-        self.gif_directory = os.path.join(os.getcwd(), "PythonTest", "service", "media_assets", "gifs")
-        self.frames_directory = os.path.join(os.getcwd(), "PythonTest", "service", "media_assets", "frames")
-        self.frames_edited_directory = os.path.join(os.getcwd(), "PythonTest", "service", "media_assets", "framesEdited")
+        self.gif_directory = os.path.join(os.getcwd(),  "service", "media_assets", "gifs")
+        self.frames_directory = os.path.join(os.getcwd(),  "service", "media_assets", "frames")
+        self.frames_edited_directory = os.path.join(os.getcwd(), "service", "media_assets", "framesEdited")
         self.coordinates = location_pixel_coordinate_map
         self.colour_waveHight_map = colour_waveHight_map_at_40_quant
     
