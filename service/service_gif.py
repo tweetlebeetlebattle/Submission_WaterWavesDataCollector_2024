@@ -47,7 +47,6 @@ class MeteoGifService:
         self._extract_gif_frames(self.gif_directory, self.frames_directory)
         self._quantize_colors_in_directory(self.frames_directory, self.frames_edited_directory, 40)
         data = self._analyze_image(self.frames_edited_directory, self.colour_waveHight_map, self.coordinates)
-        print(data)
         self._delete_all_files(self.gif_directory, self.frames_directory, self.frames_edited_directory)
         return data
     
@@ -59,7 +58,6 @@ class MeteoGifService:
         if response.status_code == 200:
             with open(gif_path, 'wb') as gif_file:
                 gif_file.write(response.content)
-            print(f'GIF downloaded and saved to {gif_path}')
             return gif_path
         else:
             print(f'Failed to download GIF. Status code: {response.status_code}')
@@ -76,7 +74,6 @@ class MeteoGifService:
             return
 
         gif_path = os.path.join(folder_path, gif_files[0])
-        print(f"Extracting frames from {gif_path}")
 
         if not os.path.exists(frame_folder):
             print(f"Folder FRAMES {frame_folder} does not exist.")

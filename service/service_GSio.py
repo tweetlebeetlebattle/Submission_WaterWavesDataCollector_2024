@@ -8,7 +8,7 @@ from service.media_assets import coordinates
 load_dotenv()
 
 class GSioService:
-    def __init__(self, params_list=['waveHeight', 'waterTemperature'], coords=coordinates.location_coordinate_map):
+    def __init__(self, params_list=['waveHeight', 'waterTemperature', 'windSpeed'], coords=coordinates.location_coordinate_map):
         from repository.repository_GSio import GlassStormIoDataRepository
         from repository.repository_GSio import DailyGlassStormReadingRepository
         self.api_key = os.getenv("glassStormIoApiKey")
@@ -18,8 +18,8 @@ class GSioService:
         self.glass_storm_repo = GlassStormIoDataRepository()
         self.daily_glass_storm_repo = DailyGlassStormReadingRepository()
 
-    def insert_glass_storm_data(self, wave_read, wave_unit_id, temp_read, temp_unit_id, date, location_id):
-        return self.glass_storm_repo.insert_data(wave_read, wave_unit_id, temp_read, temp_unit_id, date, location_id)
+    def insert_glass_storm_data(self, wave_read, wave_unit_id, temp_read, temp_unit_id, wind_speed_read, wind_unit_id, date, location_id):
+        return self.glass_storm_repo.insert_data(self, wave_read, wave_unit_id, temp_read, temp_unit_id, wind_speed_read, wind_unit_id, date, location_id)
 
     def get_all_glass_storm_data(self):
         return self.glass_storm_repo.read_all_data()
@@ -44,7 +44,7 @@ class GSioService:
     def delete_all_daily_glass_storm_readings(self):
         return self.daily_glass_storm_repo.delete_all_data()
 
-    def fetch_weather_data(self, lat, lng):
+    def fetch_weather_data(self, lat, lng, location):
         start = arrow.now('UTC').floor('day')
         end = arrow.now('UTC').shift(days=1).floor('day')
 
@@ -84,19 +84,24 @@ class GSioService:
                 wave_heights = entry.get("waveHeight", {})
                 avg_wave_height = (sum(wave_heights.values()) / len(wave_heights)
                                    if wave_heights else None)
+                
+                wind_speed = entry.get("windSpeed", {})
+                avg_wind_speed = (sum(wind_speed.values()) / len(wind_speed)
+                                   if wind_speed else None)
 
                 # Only add entry if there's at least one valid reading
-                if avg_water_temp is not None or avg_wave_height is not None:
+                if avg_water_temp is not None or avg_wave_height is not None or avg_wind_speed is not None:
                     weather_data_list.append({
-                        "Location": f"{lat},{lng}",
+                        "Location": location,
                         "time": time,
                         "water_temp": avg_water_temp,
-                        "wave_height": avg_wave_height
+                        "wave_height": avg_wave_height,
+                        "wind_speed": avg_wind_speed
                     })
             
             # Log if no data was found
             if not weather_data_list:
-                print(f"No data found for coordinates ({lat}, {lng})")
+                print(f"No data found for ({location})")
 
             return weather_data_list
 
@@ -110,7 +115,7 @@ class GSioService:
 
         for location, (lat, lng) in self.coords.items():
             print(f"Fetching weather data for {location} (Lat: {lat}, Lng: {lng})")
-            weather_data = self.fetch_weather_data(lat, lng)
+            weather_data = self.fetch_weather_data(lat, lng, location)
             weather_data_by_location[location] = weather_data
 
         return weather_data_by_location

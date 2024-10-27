@@ -1,5 +1,5 @@
 from app import db
-from .Models.Models import GifData, DailyGifReading
+from .Models.Models import GifData, DailyGifReading, to_dict
 
 class GifDataRepository:
     def __init__(self):
@@ -27,7 +27,7 @@ class GifDataRepository:
     def read_all_data(self):
         try:
             data = db.session.query(GifData).all()
-            return data
+            return [to_dict(item) for item in data]
         except Exception as e:
             print(f"An error occurred: {e}")
             return None

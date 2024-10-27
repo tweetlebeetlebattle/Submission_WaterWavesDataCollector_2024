@@ -1,17 +1,19 @@
 from app import db
-from .Models.Models import GlassStormIoData, DailyGlassStormReading
+from .Models.Models import GlassStormIoData, DailyGlassStormReading,  to_dict
 
 class GlassStormIoDataRepository:
     def __init__(self):
         pass
 
-    def insert_data(self, wave_read, wave_unit_id, temp_read, temp_unit_id, date, location_id):
+    def insert_data(self, wave_read, wave_unit_id, temp_read, temp_unit_id, wind_speed_read, wind_unit_id, date, location_id):
         try:
             new_glass_storm_data = GlassStormIoData(
                 WaveRead=wave_read,
                 WaveUnitId=wave_unit_id,
-                TempRead=temp_read,
+                TempRead=temp_read, 
                 TempUnitId=temp_unit_id,
+                WindSpeedIndex = wind_speed_read,
+                WindSpeedUnitId = wind_unit_id,
                 Date=date,
                 LocationId=location_id
             )
@@ -29,7 +31,7 @@ class GlassStormIoDataRepository:
     def read_all_data(self):
         try:
             data = db.session.query(GlassStormIoData).all()
-            return data
+            return [to_dict(item) for item in data]
         except Exception as e:
             print(f"An error occurred: {e}")
             return None
