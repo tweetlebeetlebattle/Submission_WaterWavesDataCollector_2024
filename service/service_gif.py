@@ -12,6 +12,8 @@ class MeteoGifService:
     def __init__(self):
         from repository.repository_gif import GifDataRepository
         from repository.repository_gif import DailyGifReadingRepository
+        from service.service_utils import ServiceUtils
+        self.service_utils = ServiceUtils()
         self.gif_data_repo = GifDataRepository()
         self.daily_gif_data_repo  = DailyGifReadingRepository()
         load_dotenv()
@@ -61,6 +63,7 @@ class MeteoGifService:
             return gif_path
         else:
             print(f'Failed to download GIF. Status code: {response.status_code}')
+            self.service_utils.insert_data_fetching_log(f'Failed to download GIF. Status code: {response.status_code}')
             return None
 
     def _extract_gif_frames(self, folder_path, frame_folder):

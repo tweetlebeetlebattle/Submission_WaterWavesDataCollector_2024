@@ -15,6 +15,9 @@ class ServiceUtils:
     def get_unit_id_by_name(self, name):
         return self.repo.get_unit_id_by_name(name)
     
+    def insert_data_fetching_log(self, log):
+        return self.repo.insert_data_fetching_log(log)
+
     def transform_bala_to_meters(self, bala):
         bala_to_meters = {
             0: 0,

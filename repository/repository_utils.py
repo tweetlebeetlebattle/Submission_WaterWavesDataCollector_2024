@@ -1,5 +1,7 @@
 from app import db
 from repository.Models import Models
+from repository.Models.Models import DataFetchingLogs
+from datetime import datetime
 
 class UtilsRepository:
     def __init__(self):
@@ -28,4 +30,20 @@ class UtilsRepository:
             print(f"An error occurred: {e}")
             return None
 
+    def insert_data_fetching_log(self, log):
+        
+        try:
+            new_log_data = DataFetchingLogs(
+                StatusLog = log,
+                Time = datetime.timezone.utcnow()   
+            )
             
+            db.session.add(new_log_data)
+            
+            db.session.commit()
+
+            return new_log_data
+        except Exception as e:
+            db.session.rollback()
+            print(f"An error occurred: {e}")
+            return None    

@@ -11,6 +11,8 @@ class GSioService:
     def __init__(self, params_list=['waveHeight', 'waterTemperature', 'windSpeed'], coords=coordinates.location_coordinate_map):
         from repository.repository_GSio import GlassStormIoDataRepository
         from repository.repository_GSio import DailyGlassStormReadingRepository
+        from service.service_utils import ServiceUtils
+        self.service_utils = ServiceUtils()
         self.api_key = os.getenv("glassStormIoApiKey")
         self.api_url = os.getenv("glassStormIoUrl")
         self.coords = coords
@@ -66,6 +68,7 @@ class GSioService:
             # Check if response was successful
             if response.status_code != 200:
                 print(f"Failed to fetch data for coordinates ({lat}, {lng}): {response.status_code}")
+                self.service_utils.insert_data_fetching_log(f"Failed to fetch data for coordinates ({lat}, {lng}): {response.status_code}")
                 return []
 
             data = response.json()

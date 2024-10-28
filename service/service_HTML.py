@@ -9,6 +9,8 @@ class MeteoHTMLService:
     def __init__(self):
         from repository.repository_HTML import HTMLDataRepository
         from repository.repository_HTML import DailyHTMLReadingRepository
+        from service.service_utils import ServiceUtils
+        self.service_utils = ServiceUtils()
         self.url = os.getenv("HTML_url")  
         self.html_data_repo = HTMLDataRepository()
         self.daily_html_reading_repo = DailyHTMLReadingRepository()
@@ -79,3 +81,4 @@ class MeteoHTMLService:
             return table_6_data
         else:
             print(f"Request failed with status code: {response.status_code}")
+            self.service_utils.insert_data_fetching_log(f"HTML Request failed with status code: {response.status_code}")

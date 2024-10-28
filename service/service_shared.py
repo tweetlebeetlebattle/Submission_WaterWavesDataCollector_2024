@@ -160,7 +160,6 @@ class SharedService:
                 wave_unit_id, date, location_id
             )
 
-
     def insert_daily_glass_storm_reading(self):
         # Initialize a dictionary to hold data aggregated by (location_id, date)
         daily_data = {}
@@ -281,3 +280,21 @@ class SharedService:
                 temp_unit_id, date, location_id
             )
 
+    def fetch_save_all_data(self):
+        try:
+            # self.record_gif_data()
+            # self.record_GSio_data()
+            self.record_HTML_data()
+
+            # self.delete_all_html_data()
+            # self.delete_all_glass_storm_data()
+            # self.delete_all_gif_data()
+
+            # self.insert_daily_html_reading()
+            # self.insert_daily_gif_reading()
+            # self.insert_daily_glass_storm_reading()
+        
+            return 1;
+        except Exception as e:
+            print(e)
+            return 0;
