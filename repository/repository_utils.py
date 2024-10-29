@@ -1,7 +1,7 @@
 from app import db
 from repository.Models import Models
 from repository.Models.Models import DataFetchingLogs
-from datetime import datetime
+from datetime import datetime, timezone
 
 class UtilsRepository:
     def __init__(self):
@@ -35,7 +35,7 @@ class UtilsRepository:
         try:
             new_log_data = DataFetchingLogs(
                 StatusLog = log,
-                Time = datetime.timezone.utcnow()   
+                Time=datetime.now(timezone.utc)   
             )
             
             db.session.add(new_log_data)

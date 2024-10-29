@@ -21,7 +21,7 @@ class GSioService:
         self.daily_glass_storm_repo = DailyGlassStormReadingRepository()
 
     def insert_glass_storm_data(self, wave_read, wave_unit_id, temp_read, temp_unit_id, wind_speed_read, wind_unit_id, date, location_id):
-        return self.glass_storm_repo.insert_data(self, wave_read, wave_unit_id, temp_read, temp_unit_id, wind_speed_read, wind_unit_id, date, location_id)
+        return self.glass_storm_repo.insert_data(wave_read, wave_unit_id, temp_read, temp_unit_id, wind_speed_read, wind_unit_id, date, location_id)
 
     def get_all_glass_storm_data(self):
         return self.glass_storm_repo.read_all_data()

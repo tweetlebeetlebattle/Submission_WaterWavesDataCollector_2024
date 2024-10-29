@@ -282,18 +282,18 @@ class SharedService:
 
     def fetch_save_all_data(self):
         try:
-            self.record_gif_data()
+            # self.record_gif_data()
             self.record_GSio_data()
-            self.record_HTML_data()
+            # self.record_HTML_data()
 
-            self.insert_daily_html_reading()
-            self.insert_daily_gif_reading()
-            self.insert_daily_glass_storm_reading()
+            # self.insert_daily_html_reading()
+            # self.insert_daily_gif_reading()
+            # self.insert_daily_glass_storm_reading()
         
         
-            self.delete_all_html_data()
-            self.delete_all_glass_storm_data()
-            self.delete_all_gif_data()
+            # self.delete_all_html_data()
+            # self.delete_all_glass_storm_data()
+            # self.delete_all_gif_data()
             return 1;
         except Exception as e:
             print(e)
