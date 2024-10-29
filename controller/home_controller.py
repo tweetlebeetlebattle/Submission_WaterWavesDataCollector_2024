@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify
-from test import testing
 home_controller = Blueprint('home', __name__)
 
 @home_controller.route('/')
