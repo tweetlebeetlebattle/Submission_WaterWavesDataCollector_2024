@@ -296,5 +296,5 @@ class SharedService:
             self.delete_all_gif_data()
             return 1;
         except Exception as e:
-            print(e)
-            return 0;
+            print(e, flush=True)
+            return e;
