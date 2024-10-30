@@ -23,7 +23,10 @@ class MeteoGifService:
         self.frames_edited_directory = os.path.join(os.getcwd(), "service", "media_assets", "framesEdited")
         self.coordinates = location_pixel_coordinate_map
         self.colour_waveHight_map = colour_waveHight_map_at_40_quant
-    
+
+        os.makedirs(self.gif_directory, exist_ok=True)
+        os.makedirs(self.frames_directory, exist_ok=True)
+        os.makedirs(self.frames_edited_directory, exist_ok=True)
     def insert_gif_data(self, wave_read, wave_unit_id, date, location_id):
         return self.gif_data_repo.insert_data(wave_read, wave_unit_id, date, location_id)
 
