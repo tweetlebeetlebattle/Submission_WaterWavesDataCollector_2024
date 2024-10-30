@@ -1,6 +1,7 @@
 from flask import Flask
 from repository.Models.Models import db, initialize_database  
 from controller.home_controller import home_controller
+import os
 
 def create_app():
     app = Flask(__name__)
@@ -20,5 +21,6 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True, port=5001)  
+    port = int(os.getenv("PORT", 5001))
+    app.run(debug=True, port=port)
 
