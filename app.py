@@ -1,5 +1,5 @@
 from flask import Flask
-from repository.Models.Models import db, initialize_database  # Import db and initialize function
+from repository.Models.Models import db, initialize_database  
 from controller.home_controller import home_controller
 
 def create_app():
@@ -9,7 +9,7 @@ def create_app():
     db.init_app(app)
     
     with app.app_context():
-        initialize_database(app)  # Reflect existing tables
+        initialize_database(app)  
     
     @app.teardown_appcontext
     def shutdown_session(exception=None):
@@ -20,4 +20,5 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    app.run(debug=True)
+    app.run(debug=True, port=5001)  
+
