@@ -161,18 +161,16 @@ class SharedService:
             )
 
     def insert_daily_glass_storm_reading(self):
-        # Initialize a dictionary to hold data aggregated by (location_id, date)
         daily_data = {}
         
-        # Fetch all Glass Storm data for aggregation
         all_glass_storm_data = self.serv_GSio.get_all_glass_storm_data()
         
         for data in all_glass_storm_data:
-            location_id = data['location_id']
-            date = data['date']
-            wave_height = data['wave_height']
-            temp = data['water_temp']
-            wind_speed = data['wind_speed']
+            location_id = data['LocationId']
+            date = data['Date']
+            wave_height = data['WaveRead']
+            temp = data['TempRead']
+            wind_speed = data['WindSpeedIndex']
             
             key = (location_id, date)
             
@@ -181,9 +179,9 @@ class SharedService:
                     'wave_heights': [],
                     'temps': [],
                     'wind_speeds': [],
-                    'wave_unit_id': data['wave_unit_id'],
-                    'temp_unit_id': data['temp_unit_id'],
-                    'wind_unit_id': data['wind_unit_id']
+                    'wave_unit_id': data['WaveUnitId'],
+                    'temp_unit_id': data['TempUnitId'],
+                    'wind_unit_id': data['WindSpeedUnitId']
                 }
             
             daily_data[key]['wave_heights'].append(wave_height)
@@ -212,7 +210,6 @@ class SharedService:
             temp_unit_id = values['temp_unit_id']
             wind_unit_id = values['wind_unit_id']
             
-            # Insert the daily reading into the database
             self.serv_GSio.insert_daily_glass_storm_reading(
                 daily_wave_max, daily_wave_min, daily_wave_avg, 
                 wave_unit_id, daily_temp_max, daily_temp_min, daily_temp_avg, 
@@ -294,7 +291,7 @@ class SharedService:
             self.delete_all_html_data()
             self.delete_all_glass_storm_data()
             self.delete_all_gif_data()
-            return 1;
+            return 1
         except Exception as e:
             print(e, flush=True)
-            return e;
+            return e
