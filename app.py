@@ -1,7 +1,13 @@
 from flask import Flask
-from repository.Models.Models import db, initialize_database  
+from apscheduler.schedulers.background import BackgroundScheduler
+from repository.Models.Models import db, initialize_database
 from controller.home_controller import home_controller
 import os
+
+def schedule_fetch_save_data():
+    from service.service_shared import SharedService 
+    service = SharedService()
+    service.fetch_save_all_data()
 
 def create_app():
     app = Flask(__name__)
@@ -16,6 +22,11 @@ def create_app():
     def shutdown_session(exception=None):
         db.session.remove()
 
+    # Initialize the scheduler
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(func=schedule_fetch_save_data, trigger="interval", days=1)
+    scheduler.start()
+
     app.register_blueprint(home_controller)
     return app
 
@@ -23,4 +34,3 @@ if __name__ == '__main__':
     app = create_app()
     port = int(os.getenv("PORT", 5001))
     app.run(host="0.0.0.0", port=port)
-
