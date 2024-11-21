@@ -5,10 +5,10 @@ from controller.home_controller import home_controller
 import os
 
 def schedule_fetch_save_data():
-    from service.service_shared import SharedService 
+    from service.service_shared import SharedService
     service = SharedService()
     service.fetch_save_all_data()
-
+    
 def create_app():
     app = Flask(__name__)
     app.config.from_object('repository.dbConfig.DevelopmentConfig')
@@ -22,9 +22,8 @@ def create_app():
     def shutdown_session(exception=None):
         db.session.remove()
 
-    # Initialize the scheduler
     scheduler = BackgroundScheduler()
-    scheduler.add_job(func=schedule_fetch_save_data, trigger="interval", days=1)
+    scheduler.add_job(func=schedule_fetch_save_data, trigger='cron', hour=18, minute=30)
     scheduler.start()
 
     app.register_blueprint(home_controller)
