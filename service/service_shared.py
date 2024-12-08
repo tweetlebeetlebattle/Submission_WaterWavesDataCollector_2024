@@ -42,7 +42,7 @@ class SharedService:
     
     def record_gif_data(self,isSavingOnlyTodaysData=True):
         gif_data = self.serv_gif.fetch_gif_data()
-        wave_unit_id = self.serv_utils.get_unit_id_by_name("Метра")
+        wave_unit_id = self.serv_utils.get_unit_id_by_name("Метра") or -2
 
         for data in gif_data:
             frame_id = data['id']
