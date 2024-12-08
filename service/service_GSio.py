@@ -47,8 +47,9 @@ class GSioService:
         return self.daily_glass_storm_repo.delete_all_data()
 
     def fetch_weather_data(self, lat, lng, location):
-        start = arrow.now('UTC').floor('day')
-        end = arrow.now('UTC').shift(days=1).floor('day')
+        start = arrow.now('UTC').floor('day').shift(minutes=1)
+
+        end = arrow.now('UTC').floor('day').shift(hours=23, minutes=59)
 
         try:
             response = requests.get(

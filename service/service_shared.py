@@ -40,7 +40,7 @@ class SharedService:
                 wave_read, wave_unit_id, water_temp, temp_unit_id, date, location_id
             )
     
-    def record_gif_data(self):
+    def record_gif_data(self,isSavingOnlyTodaysData=True):
         gif_data = self.serv_gif.fetch_gif_data()
         wave_unit_id = self.serv_utils.get_unit_id_by_name("Метра")
 
@@ -58,6 +58,9 @@ class SharedService:
                 date = (datetime.now() + timedelta(days=2)).date()
             else:
                 print(f"Skipping frame with ID {frame_id} as it falls outside the specified range.")
+                continue
+            if isSavingOnlyTodaysData and not (0 <= frame_id <= 8):
+                print(f"Skipping frame with ID {frame_id} as it does not correspond to today's date.")
                 continue
 
             print("Frame ID:", frame_id)
